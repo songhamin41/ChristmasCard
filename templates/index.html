@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Letters to Me</title>
+</head>
+<body>
+    <div style="background-image: url('{{ url_for('static', filename='uploads/christmas_background.jpg') }}'); background-size: cover; height: 100vh;">
+        <h1>Letters to Me</h1>
+        <ul>
+            {% for letter in letters %}
+            <li style="background-image: url('{{ url_for('static', filename='uploads/christmas_letter_bg.png') }}'); background-size: cover; padding: 20px; margin: 10px; border-radius: 10px;">
+                <h2>{{ letter.name }} - {{ letter.date.strftime('%Y-%m-%d') }}</h2>
+                <p>{{ letter.message }}</p>
+                {% if letter.image %}
+                <img src="{{ url_for('static', filename='uploads/' + letter.image) }}" alt="Image" style="max-width: 200px; border-radius: 10px;">
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('main.write_letter') }}">Write a Letter</a>
+    </div>
+    <audio autoplay loop>
+        <source src="{{ url_for('static', filename='bgm/christmas_bgm.mp3.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+</body>
+</html>
