@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 def create_app():
-    app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '..', 'templates'))
+    app = Flask(__name__)
     app.config.from_object('config.Config')
 
     # SQLAlchemy 초기화
@@ -22,3 +22,4 @@ def create_app():
         db.create_all()  # 테이블 생성
 
     return app
+
