@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>편지 수정✏️</title>
+</head>
+<body>
+    <h1>편지 수정✏️</h1>
+    <form action="{{ url_for('main.update_letter', letter_id=letter.id) }}" method="POST" enctype="multipart/form-data">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ letter.name }}" required>
+        <br>
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" required>{{ letter.message }}</textarea>
+        <br>
+        {% if letter.image %}
+        <p>현재 이미지:</p>
+        <img src="{{ url_for('static', filename='uploads/' + letter.image) }}" alt="Image" class="letter-image">
+        {% endif %}
+        <label for="image">이미지 변경📁:</label>
+        <input type="file" id="image" name="image">
+        <br>
+        <button type="submit" class="write-button">수정 완료✅</button>
+    </form>
+</body>
+</html>

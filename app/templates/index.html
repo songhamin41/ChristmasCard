@@ -4,27 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Letters to Me</title>
+    <title>크리스마스 편지함 📬</title>
 </head>
 <body>
-    <div style="background-image: url('{{ url_for('static', filename='uploads/christmas_background.jpg') }}'); background-size: cover; height: 100vh;">
-        <h1>Letters to Me</h1>
+    <div class="container">
+        <h1>크리스마스 편지함 📬</h1>
+
+        <!-- 편지 작성 버튼 -->
+        <a href="{{ url_for('main.write_letter') }}" class="write-button">편지 작성 ✍️</a>
+
+        <!-- 편지 리스트 -->
         <ul>
             {% for letter in letters %}
-            <li style="background-image: url('{{ url_for('static', filename='uploads/christmas_letter_bg.png') }}'); background-size: cover; padding: 20px; margin: 10px; border-radius: 10px;">
+            <li class="letter-card">
                 <h2>{{ letter.name }} - {{ letter.date.strftime('%Y-%m-%d') }}</h2>
                 <p>{{ letter.message }}</p>
                 {% if letter.image %}
-                <img src="{{ url_for('static', filename='uploads/' + letter.image) }}" alt="Image" style="max-width: 200px; border-radius: 10px;">
+                <img src="{{ url_for('static', filename='uploads/' + letter.image) }}" alt="Image" class="letter-image">
                 {% endif %}
+
+                <!-- 삭제 버튼 -->
+                <form action="{{ url_for('main.delete_letter', letter_id=letter.id) }}" method="POST" class="delete-form">
+                    <button type="submit" class="delete-button">지우기 🗑️</button>
+                </form>
+
+                <!-- 수정 버튼 -->
+                <form action="{{ url_for('main.edit_letter', letter_id=letter.id) }}" method="GET" class="edit-form">
+                    <button type="submit" class="edit-button">수정하기 📝</button>
+                </form>
             </li>
             {% endfor %}
         </ul>
-        <a href="{{ url_for('main.write_letter') }}">Write a Letter</a>
     </div>
-    <audio autoplay loop>
-        <source src="{{ url_for('static', filename='bgm/christmas_bgm.mp3.mp3') }}" type="audio/mpeg">
+
+    <!-- 브금 -->
+    <audio id="bgm" autoplay loop>
+        <source src="{{ url_for('static', filename='bgm/christmas_bgm.mp3') }}" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
+    <button id="toggle-audio">🔇 소리 끄기</button>
+
+    <script>
+        const bgm = document.getElementById('bgm');
+        const toggleAudioButton = document.getElementById('toggle-audio');
+
+        toggleAudioButton.addEventListener('click', () => {
+            if (bgm.muted) {
+                bgm.muted = false;
+                toggleAudioButton.textContent = '🔇 소리 끄기';
+            } else {
+                bgm.muted = true;
+                toggleAudioButton.textContent = '🔊 소리 켜기';
+            }
+        });
+
+        // 브라우저 정책에 따른 초기 설정
+        document.addEventListener('DOMContentLoaded', () => {
+            bgm.play().catch(() => {
+                bgm.muted = true;
+                toggleAudioButton.textContent = '🔊 소리 켜기';
+            });
+        });
+    </script>
 </body>
 </html>
