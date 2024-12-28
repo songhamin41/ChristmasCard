@@ -1,0 +1,78 @@
+<form method="POST" class="login-form" action="{{ url_for ('auth.login')}}">
+    {{ form.hidden_tag() }}
+    <h2>로그인</h2>
+
+    <div class="input-group">
+        <label for="username">아이디</label>
+        {{ form.username(class="form-control", placeholder="아이디를 입력하세요") }}
+    </div>
+
+    <div class="input-group">
+        <label for="password">비밀번호</label>
+        {{ form.password(class="form-control", placeholder="비밀번호를 입력하세요") }}
+    </div>
+
+    <button type="submit" class="btn-primary">로그인</button>
+
+    <p class="register-link">
+        계정이 없으신가요? <a href="{{ url_for('auth.register') }}">회원가입</a>
+    </p>
+</form>
+
+<style>
+    body {
+        font-family: 'Noto Sans KR', sans-serif;
+        background: url("{{ url_for('static', filename='uploads/christmas_background.jpg') }}") no-repeat center center fixed;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .login-form {
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 350px;
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .btn-primary {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .register-link a {
+        color: #4CAF50;
+        text-decoration: none;
+    }
+</style>

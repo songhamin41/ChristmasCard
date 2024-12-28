@@ -1,34 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>편지 작성</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Write a Letter</title>
 </head>
 <body>
-    <h1>편지 작성✍️</h1>
+    <h1>편지 작성하기</h1>
+
     <form method="POST" action="{{ url_for('main.write_letter') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}  <!-- CSRF 토큰 추가 -->
+        
         <label for="name">이름:</label>
-        <input type="text" id="name" name="name" required>
-        <br>
+        <input type="text" name="name" required><br>
+
         <label for="message">메시지:</label>
-        <textarea id="message" name="message" required></textarea>
-        <br>
-        <label for="image">이미지 첨부📁:</label>
-        <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
-        <br>
-        <img id="imagePreview" style="max-width: 200px; margin-top: 10px; display: none; border-radius: 10px;">
-        <br>
+        <textarea name="message" required></textarea><br>
+
+        <label for="image">이미지 첨부 (선택):</label>
+        <input type="file" name="image"><br>
+
         <button type="submit">보내기</button>
     </form>
-
-    <script>
-        function previewImage(event) {
-            const preview = document.getElementById('imagePreview');
-            preview.src = URL.createObjectURL(event.target.files[0]);
-            preview.style.display = 'block';
-        }
-    </script>
 </body>
 </html>

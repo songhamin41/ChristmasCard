@@ -1,48 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>크리스마스 편지함 📬</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* 전체 배경 */
+        body {
+            background: url("{{ url_for('static', filename='uploads/christmas_background.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+        }
+        .login-button {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background-color: #ff4d4d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .write-button {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .letter-card {
+            background: url("{{ url_for('static', filename='uploads/christmas_letter_bg.png') }}") no-repeat center center;
+            background-size: contain;
+            padding: 40px;
+            margin: 20px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .letter-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+        .like-button, .delete-button, .edit-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .like-button {
+            background-color: #ff4d4d;
+            color: white;
+        }
+        .delete-button {
+            background-color: #ff3333;
+            color: white;
+        }
+        .edit-button {
+            background-color: #2196F3;
+            color: white;
+        }
+        .audio-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ffcc00;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
+    <!-- 배경 음악 -->
+    <audio id="bgm" autoplay loop>
+        <source src="{{ url_for('static', filename='bgm/christmas_bgm.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <button id="toggle-audio" class="audio-button">🔊 소리 끄기</button>
+
     <div class="container">
         <h1>크리스마스 편지함 📬</h1>
+
+        <!-- 로그인 버튼 -->
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.login') }}" class="login-button">로그인</a>
+        {% else %}
+        <a href="{{ url_for('auth.logout') }}" class="login-button">로그아웃</a>
+        {% endif %}
 
         <!-- 편지 작성 버튼 -->
         <a href="{{ url_for('main.write_letter') }}" class="write-button">편지 작성 ✍️</a>
 
-        <!-- 편지 리스트 -->
+        <!-- 편지 목록 -->
         <ul>
             {% for letter in letters %}
             <li class="letter-card">
                 <h2>{{ letter.name }} - {{ letter.date.strftime('%Y-%m-%d') }}</h2>
                 <p>{{ letter.message }}</p>
                 {% if letter.image %}
-                <img src="{{ url_for('static', filename='uploads/' + letter.image) }}" alt="Image" class="letter-image">
+                <img src="{{ url_for('static', filename='uploads/' + letter.image) }}" class="letter-image" alt="편지 이미지">
                 {% endif %}
 
-                <!-- 삭제 버튼 -->
-                <form action="{{ url_for('main.delete_letter', letter_id=letter.id) }}" method="POST" class="delete-form">
-                    <button type="submit" class="delete-button">지우기 🗑️</button>
-                </form>
+                <p>❤️ {{ letter.likes.count() }} Likes</p>
 
-                <!-- 수정 버튼 -->
-                <form action="{{ url_for('main.edit_letter', letter_id=letter.id) }}" method="GET" class="edit-form">
+                <!-- 좋아요 버튼 -->
+                {% if current_user.is_authenticated %}
+                <form action="{{ url_for('main.like_letter', letter_id=letter.id) }}" method="POST">
+                    <button type="submit" class="like-button">
+                        {% if current_user in letter.likes %}
+                        좋아요 취소 💔
+                        {% else %}
+                        좋아요 ❤️
+                        {% endif %}
+                    </button>
+                </form>
+                
+                <!-- 수정 및 삭제 버튼 (작성자만 가능) -->
+                {% if current_user.id == letter.user_id %}
+                <form action="{{ url_for('main.edit_letter', letter_id=letter.id) }}" method="GET">
                     <button type="submit" class="edit-button">수정하기 📝</button>
                 </form>
+
+                <form action="{{ url_for('main.delete_letter', letter_id=letter.id) }}" method="POST">
+                    <button type="submit" class="delete-button">지우기 🗑️</button>
+                </form>
+                {% endif %}
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="like-button">❤️ 좋아요 (로그인 필요)</a>
+                {% endif %}
             </li>
             {% endfor %}
         </ul>
     </div>
-
-    <!-- 브금 -->
-    <audio id="bgm" autoplay loop>
-        <source src="{{ url_for('static', filename='bgm/christmas_bgm.mp3') }}" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-    <button id="toggle-audio">🔇 소리 끄기</button>
 
     <script>
         const bgm = document.getElementById('bgm');
@@ -51,19 +153,11 @@
         toggleAudioButton.addEventListener('click', () => {
             if (bgm.muted) {
                 bgm.muted = false;
-                toggleAudioButton.textContent = '🔇 소리 끄기';
+                toggleAudioButton.textContent = '🔊 소리 끄기';
             } else {
                 bgm.muted = true;
-                toggleAudioButton.textContent = '🔊 소리 켜기';
+                toggleAudioButton.textContent = '🔇 소리 켜기';
             }
-        });
-
-        // 브라우저 정책에 따른 초기 설정
-        document.addEventListener('DOMContentLoaded', () => {
-            bgm.play().catch(() => {
-                bgm.muted = true;
-                toggleAudioButton.textContent = '🔊 소리 켜기';
-            });
         });
     </script>
 </body>
